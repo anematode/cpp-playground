@@ -7,6 +7,7 @@
 #include "classgraph/Swaps.h"
 #include <cassert>
 #include <algorithm>
+#include <vector>
 #include <utility>
 #include <numeric>
 #include <random>

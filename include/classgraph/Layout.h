@@ -6,6 +6,7 @@
 
 #include <istream>
 #include <array>
+#include <vector>
 #include <cassert>
 
 namespace classgraph {

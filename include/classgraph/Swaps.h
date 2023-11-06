@@ -1,6 +1,11 @@
 #pragma once
 
 #include "Layout.h"
+#include <vector>
+
+#ifdef __AVX2__
+#include <immintrin.h>
+#endif
 
 #ifdef __ARM_NEON__
 #include <arm_neon.h>
@@ -39,16 +44,12 @@ namespace classgraph {
 #define ITER(prefix, si, vtype, stride) {\
                 vtype splat_a = prefix##_set1_epi16(a), splat_b = prefix##_set1_epi16(b); \
                 while (begin + stride - 1 < end) { \
-                    vtype load = prefix##_loadu_##si##((const vtype*) begin); \
+                    vtype load = prefix##_loadu_##si((const vtype*) begin); \
                     vtype matches_a = prefix##_cmpeq_epi16(load, splat_a); \
                     vtype matches_b = prefix##_cmpeq_epi16(load, splat_b); \
-                    vtype matches_any = prefix##_or_##si##(matches_a, matches_b); \
-                    vtype keep = prefix##_andn_##si##(matches_any, load); \
-                    vtype a_swap = prefix##_and_##si##(matches_a, splat_b); \
-                    vtype b_swap = prefix##_and_##si##(matches_b, splat_a); \
-                    vtype swapped = prefix##_or_##si##(a_swap, b_swap); \
-                    vtype result = prefix##_or_##si##(keep, swapped); \
-                    prefix##_storeu_##si##((vtype*) begin, result); \
+                    vtype result = prefix##_blendv_epi8(load, splat_b, matches_a); \
+                    result = prefix##_blendv_epi8(result, splat_a,  matches_b); \
+                    prefix##_storeu_##si((vtype*) begin, result); \
                     begin += stride; \
                 }\
             }
