@@ -18,6 +18,20 @@ namespace classgraph {
     using ClassID = uint8_t;
     using Prereqs = std::array<ClassID, MAX_PREREQS>;
 
+    struct FPoint {
+        float x;
+        float y;
+    };
+
+    struct Point {
+        int x;
+        int y;
+
+        Point operator-(const Point& other) {
+            return { .x = x - other.x, .y = y - other.y };
+        }
+    };
+
     struct SmallPoint {
         uint8_t x;
         uint8_t y;
@@ -25,12 +39,12 @@ namespace classgraph {
         [[nodiscard]] uint16_t asU16() const {
             return *reinterpret_cast<const uint16_t*>(this);
         }
+
+        Point point() const {
+            return { .x = x, .y = y };
+        }
     };
 
-    struct FPoint {
-        float x;
-        float y;
-    };
 
     struct Connexion {
         SmallPoint pt1;
